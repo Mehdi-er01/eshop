@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  globale-db:
+    build: ./globale_db/
+    container_name: globale-db
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PASSWORD=admin
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "echo \"ALTER SESSION SET CONTAINER = ESHOP_GLOBALE_PDB; SELECT 1 FROM GLOBALE_USER.INIT_COMPLETE;\" | sqlplus -s / as sysdba | grep -q '1'"]
+      interval: 30s
+      timeout: 20s
+      retries: 20
+      start_period: 60s
+    networks:
+      oracle-net:
+        ipv4_address: 192.168.1.10
+
+  site1-db:
+    build: ./site_1_db/
+    container_name: site1-db
+    ports:
+      - "1522:1521"
+    environment:
+      - ORACLE_PASSWORD=admin
+      - APP_USER=site1_username
+      - APP_USER_PASSWORD=site1_password
+      - ORACLE_PDB=ESHOP_SITE1_PDB
+    restart: unless-stopped
+    depends_on:
+      globale-db:
+        condition: service_healthy
+    networks:
+      oracle-net:
+        ipv4_address: 192.168.1.11
+
+  site2-db:
+    build: ./site_2_db/
+    container_name: site2-db
+    ports:
+      - "1523:1521"
+    environment:
+      - ORACLE_PASSWORD=admin
+      - APP_USER=site2_username
+      - APP_USER_PASSWORD=site2_password
+      - ORACLE_PDB=ESHOP_SITE2_PDB
+    restart: unless-stopped
+    depends_on:
+      globale-db:
+        condition: service_healthy
+    networks:
+      oracle-net:
+        ipv4_address: 192.168.1.12
+
+networks:
+  oracle-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
