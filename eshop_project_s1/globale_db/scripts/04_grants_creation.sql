@@ -1,0 +1,25 @@
+SET SERVEROUTPUT ON;
+SET SQLBLANKLINES ON;
+
+ALTER SESSION SET CONTAINER = ESHOP_GLOBALE_PDB;
+ALTER SESSION SET CURRENT_SCHEMA = globale_user;
+
+DECLARE
+    TYPE t_table_list IS TABLE OF VARCHAR2(50);
+    v_tables t_table_list := t_table_list(
+        'FOURNISSEURS',
+        'CATEGORIES',
+        'EMPLOYES',
+        'CLIENTS',
+        'PRODUITS',
+        'COMMANDES',
+        'LIGNES_COMMANDES'
+    );
+BEGIN
+    FOR i IN 1 .. v_tables.COUNT LOOP
+        EXECUTE IMMEDIATE 'GRANT SELECT ON ' || v_tables(i) || ' TO site1_user';
+        EXECUTE IMMEDIATE 'GRANT SELECT ON ' || v_tables(i) || ' TO site2_user';
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('SELECT PRIVILEGES GRANTED ON ALL TABLES TO SITE USERS SUCCESSFULLY');
+END;
+/

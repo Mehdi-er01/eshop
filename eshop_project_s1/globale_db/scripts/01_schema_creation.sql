@@ -112,24 +112,6 @@ BEGIN
                      || ', '
                      || v_site2_user_name;
 
-   DECLARE
-       TYPE t_table_list IS TABLE OF VARCHAR2(50);
-       v_tables t_table_list := t_table_list(
-           'FOURNISSEURS', 
-           'CATEGORIES', 
-           'EMPLOYES', 
-           'CLIENTS', 
-           'PRODUITS', 
-           'COMMANDES', 
-           'LIGNES_COMMANDES'
-       );
-   BEGIN
-       FOR i IN 1 .. v_tables.COUNT LOOP
-           EXECUTE IMMEDIATE 'GRANT SELECT ON ' || v_tables(i) || ' TO ' || v_site1_user_name;
-           EXECUTE IMMEDIATE 'GRANT SELECT ON ' || v_tables(i) || ' TO ' || v_site2_user_name;
-       END LOOP;
-       DBMS_OUTPUT.PUT_LINE('SELECT PRIVILEGES GRANTED ON ALL TABLES SUCCESSFULLY');
-   END;
    DBMS_OUTPUT.PUT_LINE('PRIVILEGES GRANTED SUCCESSFULLY');
 END;
 /
