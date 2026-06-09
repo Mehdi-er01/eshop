@@ -1,0 +1,24 @@
+SET SERVEROUTPUT ON;
+
+ALTER SESSION SET CONTAINER = ESHOP_SITE1_PDB;
+ALTER SESSION SET CURRENT_SCHEMA = globale_user;
+
+SET SERVEROUTPUT ON;
+
+ALTER SESSION SET CONTAINER = ESHOP_SITE1_PDB;
+ALTER SESSION SET CURRENT_SCHEMA = globale_user;
+
+DECLARE
+   TYPE t_table_list IS TABLE OF VARCHAR2(50);
+   v_tables t_table_list := t_table_list(
+       'FOURNISSEURS', 'CATEGORIES', 'EMPLOYES', 
+       'CLIENTS', 'PRODUITS', 'COMMANDES', 'LIGNES_COMMANDES'
+   );
+BEGIN
+   FOR i IN 1 .. v_tables.COUNT LOOP
+       EXECUTE IMMEDIATE 'CREATE OR REPLACE PUBLIC SYNONYM ' || v_tables(i) || '_G' ||
+                         ' FOR ' || v_tables(i) || '@GLOBALE';
+   END LOOP;
+   DBMS_OUTPUT.PUT_LINE('SUCCESS: Public global synonyms created (FOURNISSEURS_G -> @GLOBALE)');
+END;
+/
