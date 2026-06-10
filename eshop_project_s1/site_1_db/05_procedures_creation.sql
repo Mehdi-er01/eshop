@@ -40,13 +40,13 @@ BEGIN
             v_cl  CLIENTS_G%ROWTYPE;
             v_emp EMPLOYES_G%ROWTYPE;
         BEGIN
-            SELECT * INTO v_cmd FROM COMMANDES_G@GLOBALE
+            SELECT * INTO v_cmd FROM COMMANDES_G
             WHERE ID_COMMANDE = p_id_commande;
 
             -- Ensure Client
             SELECT COUNT(*) INTO nc FROM CLIENTS_1 WHERE ID_CLIENT = v_cmd.ID_CLIENT;
             IF nc = 0 THEN
-                SELECT * INTO v_cl FROM CLIENTS_G@GLOBALE
+                SELECT * INTO v_cl FROM CLIENTS_G
                 WHERE ID_CLIENT = v_cmd.ID_CLIENT;
                 INSERT INTO CLIENTS_1 VALUES v_cl;
             END IF;
@@ -54,7 +54,7 @@ BEGIN
             -- Ensure Employe
             SELECT COUNT(*) INTO nc FROM EMPLOYES_1 WHERE ID_EMPLOYE = v_cmd.ID_EMPLOYE;
             IF nc = 0 THEN
-                SELECT * INTO v_emp FROM EMPLOYES_G@GLOBALE
+                SELECT * INTO v_emp FROM EMPLOYES_G
                 WHERE ID_EMPLOYE = v_cmd.ID_EMPLOYE;
                 INSERT INTO EMPLOYES_1 VALUES v_emp;
             END IF;
@@ -71,14 +71,14 @@ BEGIN
             v_four FOURNISSEURS_G%ROWTYPE;
             v_cat  CATEGORIES_G%ROWTYPE;
         BEGIN
-            SELECT * INTO v_prod FROM PRODUITS_G@GLOBALE
+            SELECT * INTO v_prod FROM PRODUITS_G
             WHERE ID_PRODUIT = p_id_produit;
 
             -- Ensure Fournisseur
             SELECT COUNT(*) INTO nc FROM FOURNISSEURS_1
             WHERE ID_FOURNISSEUR = v_prod.ID_FOURNISSEUR;
             IF nc = 0 THEN
-                SELECT * INTO v_four FROM FOURNISSEURS_G@GLOBALE
+                SELECT * INTO v_four FROM FOURNISSEURS_G
                 WHERE ID_FOURNISSEUR = v_prod.ID_FOURNISSEUR;
                 INSERT INTO FOURNISSEURS_1 VALUES v_four;
             END IF;
@@ -87,7 +87,7 @@ BEGIN
             SELECT COUNT(*) INTO nc FROM CATEGORIES_1
             WHERE ID_CATEGORIE = v_prod.ID_CATEGORIE;
             IF nc = 0 THEN
-                SELECT * INTO v_cat FROM CATEGORIES_G@GLOBALE
+                SELECT * INTO v_cat FROM CATEGORIES_G
                 WHERE ID_CATEGORIE = v_prod.ID_CATEGORIE;
                 INSERT INTO CATEGORIES_1 VALUES v_cat;
             END IF;
@@ -106,15 +106,17 @@ BEGIN
     VALUES
         (p_id_ligne_commande, p_id_commande, p_id_produit, v_id_client, p_quantite, p_remise);
 
-    COMMIT;
+    -- COMMIT; -- Cannot commit inside a trigger
     DBMS_OUTPUT.PUT_LINE('SUCCESS: Ligne commande inserted.');
 
 EXCEPTION
     WHEN NOT_VALID THEN
         DBMS_OUTPUT.PUT_LINE(v_error_msg);
+        RAISE; -- Re-raise to ensure calling trigger knows it failed
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('UNEXPECTED DATABASE ERROR: ' || SQLERRM);
-        ROLLBACK;
+        -- ROLLBACK; -- Cannot rollback inside a trigger
+        RAISE; -- Re-raise to ensure calling trigger knows it failed
 END insert_ligne;
 /
 CREATE OR REPLACE PROCEDURE delete_ligne (
@@ -157,13 +159,14 @@ BEGIN
         END IF;
     END IF;
 
-    COMMIT;
+    -- COMMIT; -- Cannot commit inside a trigger
     DBMS_OUTPUT.PUT_LINE('SUCCESS: Ligne commande deleted.');
 
 EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('UNEXPECTED ERROR: ' || SQLERRM);
-        ROLLBACK;
+        -- ROLLBACK; -- Cannot rollback inside a trigger
+        RAISE;
 END delete_ligne;
 /
 CREATE OR REPLACE PROCEDURE update_ligne (
@@ -201,13 +204,13 @@ BEGIN
                 v_four FOURNISSEURS_G%ROWTYPE;
                 v_cat  CATEGORIES_G%ROWTYPE;
             BEGIN
-                SELECT * INTO v_prod FROM PRODUITS_G@GLOBALE
+                SELECT * INTO v_prod FROM PRODUITS_G
                 WHERE ID_PRODUIT = p_id_produit;
 
                 SELECT COUNT(*) INTO nc FROM FOURNISSEURS_1
                 WHERE ID_FOURNISSEUR = v_prod.ID_FOURNISSEUR;
                 IF nc = 0 THEN
-                    SELECT * INTO v_four FROM FOURNISSEURS_G@GLOBALE
+                    SELECT * INTO v_four FROM FOURNISSEURS_G
                     WHERE ID_FOURNISSEUR = v_prod.ID_FOURNISSEUR;
                     INSERT INTO FOURNISSEURS_1 VALUES v_four;
                 END IF;
@@ -215,7 +218,7 @@ BEGIN
                 SELECT COUNT(*) INTO nc FROM CATEGORIES_1
                 WHERE ID_CATEGORIE = v_prod.ID_CATEGORIE;
                 IF nc = 0 THEN
-                    SELECT * INTO v_cat FROM CATEGORIES_G@GLOBALE
+                    SELECT * INTO v_cat FROM CATEGORIES_G
                     WHERE ID_CATEGORIE = v_prod.ID_CATEGORIE;
                     INSERT INTO CATEGORIES_1 VALUES v_cat;
                 END IF;
@@ -247,14 +250,16 @@ BEGIN
         END IF;
     END IF;
 
-    COMMIT;
+    -- COMMIT; -- Cannot commit inside a trigger
     DBMS_OUTPUT.PUT_LINE('SUCCESS: Ligne Commande updated.');
 
 EXCEPTION
     WHEN CUSTOM_ERROR THEN
         DBMS_OUTPUT.PUT_LINE(v_error_msg);
+        RAISE;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('UNEXPECTED ERROR: ' || SQLERRM);
-        ROLLBACK;
+        -- ROLLBACK; -- Cannot rollback inside a trigger
+        RAISE;
 END update_ligne;
 /

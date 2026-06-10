@@ -1,0 +1,11 @@
+# Ignore everything by default
+*
+
+# Allow these folders and their contents
+!eshop_project_s1/
+!eshop_project_s1/**
+!eshop_project_s2/
+!eshop_project_s2/**
+
+# Allow this .gitignore file
+!.gitignore

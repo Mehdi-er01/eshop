@@ -18,7 +18,7 @@ BEGIN
     END;
 
     IF v_id_categorie = 50 AND :NEW.QUANTITE > 100 THEN
-        SITE_1.INSERT_LIGNE(
+        INSERT_LIGNE@SITE_1(
             p_id_ligne_commande => :NEW.ID_LIGNE_COMMANDE,
             p_id_commande       => :NEW.ID_COMMANDE,
             p_id_produit        => :NEW.ID_PRODUIT,
@@ -26,7 +26,7 @@ BEGIN
             p_remise            => :NEW.REMISE
         );
     ELSIF v_id_categorie = 35 AND :NEW.QUANTITE > 50 THEN
-        SITE_2.INSERT_LIGNE(
+        INSERT_LIGNE@SITE_2(
             p_id_ligne_commande => :NEW.ID_LIGNE_COMMANDE,
             p_id_commande       => :NEW.ID_COMMANDE,
             p_id_produit        => :NEW.ID_PRODUIT,
@@ -58,11 +58,11 @@ BEGIN
     END;
 
     IF v_id_categorie = 50 AND :OLD.QUANTITE > 100 THEN
-        SITE_1.DELETE_LIGNE(
+        DELETE_LIGNE@SITE_1(
             p_id_ligne_commande => :OLD.ID_LIGNE_COMMANDE
         );
     ELSIF v_id_categorie = 35 AND :OLD.QUANTITE > 50 THEN
-        SITE_2.DELETE_LIGNE(
+        DELETE_LIGNE@SITE_2(
             p_id_ligne_commande => :OLD.ID_LIGNE_COMMANDE
         );
     END IF;
@@ -124,15 +124,15 @@ BEGIN
     -- Handle transitions
     IF v_was_qualified_for_site1 THEN
         IF v_is_qualified_for_site1 THEN
-            SITE_1.UPDATE_LIGNE(
+            UPDATE_LIGNE@SITE_1(
                 p_id_ligne_commande => :NEW.ID_LIGNE_COMMANDE,
                 p_id_produit        => :NEW.ID_PRODUIT,
                 p_quantite          => :NEW.QUANTITE,
                 p_remise            => :NEW.REMISE
             );
         ELSIF v_is_qualified_for_site2 THEN
-            SITE_1.DELETE_LIGNE(p_id_ligne_commande => :OLD.ID_LIGNE_COMMANDE);
-            SITE_2.INSERT_LIGNE(
+            DELETE_LIGNE@SITE_1(p_id_ligne_commande => :OLD.ID_LIGNE_COMMANDE);
+            INSERT_LIGNE@SITE_2(
                 p_id_ligne_commande => :NEW.ID_LIGNE_COMMANDE,
                 p_id_commande       => :NEW.ID_COMMANDE,
                 p_id_produit        => :NEW.ID_PRODUIT,
@@ -140,20 +140,20 @@ BEGIN
                 p_remise            => :NEW.REMISE
             );
         ELSE
-            SITE_1.DELETE_LIGNE(p_id_ligne_commande => :OLD.ID_LIGNE_COMMANDE);
+            DELETE_LIGNE@SITE_1(p_id_ligne_commande => :OLD.ID_LIGNE_COMMANDE);
         END IF;
 
     ELSIF v_was_qualified_for_site2 THEN
         IF v_is_qualified_for_site2 THEN
-            SITE_2.UPDATE_LIGNE(
+            UPDATE_LIGNE@SITE_2(
                 p_id_ligne_commande => :NEW.ID_LIGNE_COMMANDE,
                 p_id_produit        => :NEW.ID_PRODUIT,
                 p_quantite          => :NEW.QUANTITE,
                 p_remise            => :NEW.REMISE
             );
         ELSIF v_is_qualified_for_site1 THEN
-            SITE_2.DELETE_LIGNE(p_id_ligne_commande => :OLD.ID_LIGNE_COMMANDE);
-            SITE_1.INSERT_LIGNE(
+            DELETE_LIGNE@SITE_2(p_id_ligne_commande => :OLD.ID_LIGNE_COMMANDE);
+            INSERT_LIGNE@SITE_1(
                 p_id_ligne_commande => :NEW.ID_LIGNE_COMMANDE,
                 p_id_commande       => :NEW.ID_COMMANDE,
                 p_id_produit        => :NEW.ID_PRODUIT,
@@ -161,11 +161,11 @@ BEGIN
                 p_remise            => :NEW.REMISE
             );
         ELSE
-            SITE_2.DELETE_LIGNE(p_id_ligne_commande => :OLD.ID_LIGNE_COMMANDE);
+            DELETE_LIGNE@SITE_2(p_id_ligne_commande => :OLD.ID_LIGNE_COMMANDE);
         END IF;
 
     ELSIF v_is_qualified_for_site1 THEN
-        SITE_1.INSERT_LIGNE(
+        INSERT_LIGNE@SITE_1(
             p_id_ligne_commande => :NEW.ID_LIGNE_COMMANDE,
             p_id_commande       => :NEW.ID_COMMANDE,
             p_id_produit        => :NEW.ID_PRODUIT,
@@ -174,7 +174,7 @@ BEGIN
         );
 
     ELSIF v_is_qualified_for_site2 THEN
-        SITE_2.INSERT_LIGNE(
+        INSERT_LIGNE@SITE_2(
             p_id_ligne_commande => :NEW.ID_LIGNE_COMMANDE,
             p_id_commande       => :NEW.ID_COMMANDE,
             p_id_produit        => :NEW.ID_PRODUIT,
