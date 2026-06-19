@@ -102,8 +102,15 @@ COMMIT;
 
 SELECT 'SITE_2_DELETED' AS DB, COUNT(*) AS NB FROM LIGNES_COMMANDES_2@SITE_2 WHERE ID_LIGNE_COMMANDE = 99001;
 
+select * from lignes_commandes lc
+join produits p 
+on lc.id_produit = p.id_produit
+where id_ligne_commande=99001;
+select * from lignes_commandes_1 where id_ligne_commande=99001;
+select * from lignes_commandes_2 where id_ligne_commande=99001;
+
 -- ============================================================================
--- STEP 7: TEST UPDATE -> NEWLY QUALIFIES
+-- STEP 7: TEST UPDATEsel -> NEWLY QUALIFIES
 -- Ligne 99003 is currently Unrouted (Qty=30). Let's increase it to 150.
 -- Should INSERT to Site 1
 -- ============================================================================
